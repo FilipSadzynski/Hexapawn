@@ -36,11 +36,32 @@ namespace Hexapawn
             Button klikniety = sender as Button;
             if((bool)(klikniety.Content == "BP"))
             {
+                if(state == 1) { state = 0;Reset(); }
                 int poz = Findpoz(klikniety);
                 if (poz > 2)
                 {
-                    state = 1;
-                    buttony[poz - 3].BorderBrush = Brushes.Yellow;
+                    
+                    if(buttony[poz - 3].Content == null)
+                    {
+                        buttony[poz - 3].BorderBrush = Brushes.Yellow;
+                        state = 1;
+                    }
+                    ostatni_klikniety = klikniety;
+                }
+            }
+            else
+            {
+                if (klikniety.BorderBrush == Brushes.Yellow)
+                {
+                    state = 0;
+                    klikniety.Content = "BP";
+                    ostatni_klikniety.Content = null;
+                    Reset();
+                }
+                else if (state == 1)
+                {
+                    state = 0;
+                    Reset();
                 }
             }
             
