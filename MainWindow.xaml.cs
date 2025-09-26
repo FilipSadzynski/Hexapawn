@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.IO;
 
 namespace Hexapawn
 {
@@ -27,8 +28,13 @@ namespace Hexapawn
         public MainWindow()
         {
             InitializeComponent();
+
+
             Startup();
             Reset();
+            //otwarcie pliku
+            FileStream plik = new FileStream("pozycje.txt", FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            
         }
         
         
@@ -93,6 +99,7 @@ namespace Hexapawn
                     klikniety.Content = BP;
                     ostatni_klikniety.Content = null;
                     Reset();
+                    Ruch_Czarnych();
                 }
                 else if (state == 1)
                 {
@@ -115,6 +122,7 @@ namespace Hexapawn
             buttony[0,2] = Button7;
             buttony[1,2] = Button8;
             buttony[2,2] = Button9;
+            
         }
 
         //reset wyboru 
@@ -160,9 +168,11 @@ namespace Hexapawn
                 buttony[i,0].Content = CP;
                 buttony[i, 2].Content = BP;
             }
-           
-               
-            
+        }
+
+        private void Ruch_Czarnych()
+        {
+
         }
     }
 }
