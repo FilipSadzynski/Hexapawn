@@ -20,9 +20,10 @@ namespace Hexapawn
     /// </summary>
     public partial class MainWindow : Window
     {
-        public Button[] buttony = new Button[9];
+        public Button[,] buttony = new Button[3,3];
         public int state = 0;
         public Button ostatni_klikniety;
+        public string BP="BP", CP="CP";
         public MainWindow()
         {
             InitializeComponent();
@@ -34,27 +35,62 @@ namespace Hexapawn
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             Button klikniety = sender as Button;
-            if((bool)(klikniety.Content == "BP"))
+
+            //gdy biały pionek naciśnięty
+            if((bool)(klikniety.Content == BP))
             {
+                //reset stanu wyboru
                 if(state == 1) { state = 0;Reset(); }
-                int poz = Findpoz(klikniety);
-                if (poz > 2)
+
+                //pozycja klikniętego przycisku w tablicy buttony
+                int[] poz = Findpoz(klikniety);
+
+                //szukanie pozycji do ruchu
+                    //przed pionkiem
+
+                    if (poz[1] >0)
+                        {
+                        
+                            if(buttony[poz[0],poz[1]-1].Content == null)
+                            {
+                                buttony[poz[0], poz[1] - 1].BorderBrush = Brushes.Yellow;
+                                state = 1;
+                            }
+                            ostatni_klikniety = klikniety;
+                        }
+
+                //zbicia na skos
+                if (poz[1] > 0)
                 {
-                    
-                    if(buttony[poz - 3].Content == null)
+                    //w prawo
+                    if (poz[0] > 0)
                     {
-                        buttony[poz - 3].BorderBrush = Brushes.Yellow;
-                        state = 1;
+                        if (buttony[poz[0]-1,poz[1]-1].Content == CP)
+                        {
+                            buttony[poz[0]-1, poz[1] - 1].BorderBrush = Brushes.Yellow;
+                            state = 1;
+                        }
                     }
-                    ostatni_klikniety = klikniety;
+
+                    //w lewo
+                    if (poz[0] < 2)
+                    {
+                        if (buttony[poz[0] +1, poz[1] - 1].Content == CP)
+                        {
+                            buttony[poz[0] +1, poz[1] - 1].BorderBrush = Brushes.Yellow;
+                            state = 1;
+                        }
+                    }
                 }
             }
+
+            //Przy naciśnięciu pola niebędącego białym pionkiem
             else
             {
                 if (klikniety.BorderBrush == Brushes.Yellow)
                 {
                     state = 0;
-                    klikniety.Content = "BP";
+                    klikniety.Content = BP;
                     ostatni_klikniety.Content = null;
                     Reset();
                 }
@@ -70,36 +106,49 @@ namespace Hexapawn
         //Co się dzieje przed grą
         public void Startup()
         {
-            buttony[0] = Button1;
-            buttony[1] = Button2;
-            buttony[2] = Button3;
-            buttony[3] = Button4;
-            buttony[4] = Button5;
-            buttony[5] = Button6;
-            buttony[6] = Button7;
-            buttony[7] = Button8;
-            buttony[8] = Button9;
+            buttony[0,0] = Button1;
+            buttony[1,0] = Button2;
+            buttony[2,0] = Button3;
+            buttony[0,1] = Button4;
+            buttony[1,1] = Button5;
+            buttony[2,1] = Button6;
+            buttony[0,2] = Button7;
+            buttony[1,2] = Button8;
+            buttony[2,2] = Button9;
         }
 
         //reset wyboru 
         public void Reset()
         {
-            for(int i=0; i<buttony.Length; i++)
+            for(int i=0; i<3; i++)
             {
-                buttony[i].BorderBrush = Brushes.Gray;
+                for(int j=0;j<3; j++)
+                {
+                    buttony[i,j].BorderBrush = Brushes.Gray;
+                }
+                
             }
         }
 
-        public int Findpoz(Button b)
+        public int[] Findpoz(Button b)
         {
-            for(int i = 0; i < buttony.Length; i++)
+            int[] result = new int[2];
+            for(int j = 0; j < 3; j++)
             {
-                if (b == buttony[i])
+                for(int i=0;i<3;i++)
                 {
-                    return i;
+                    if (b == buttony[i,j])
+                    {
+                        result[0] = i;
+                        result[1] = j;
+                        return result;
+                    }
                 }
+                
             }
-            return -1;
+            result[0] = -1;
+            result[1] = -1;
+            return result;
         }
 
         private void Start_Click(object sender, RoutedEventArgs e)
@@ -108,12 +157,12 @@ namespace Hexapawn
             Start.Visibility = Visibility.Collapsed;
             for(int i = 0; i <=2; i++)
             {
-                buttony[i].Content = "CP";
+                buttony[i,0].Content = CP;
+                buttony[i, 2].Content = BP;
             }
-            for (int i = 6; i <=8; i++)
-            {
-                buttony[i].Content = "BP";
-            }
+           
+               
+            
         }
     }
 }
