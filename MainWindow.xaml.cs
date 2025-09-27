@@ -25,15 +25,17 @@ namespace Hexapawn
         public Button[,] buttony = new Button[3,3];
         public int state = 0;
         public Button ostatni_klikniety;
-        public string BP="BP", CP="CP";
+        public string BP= "♔", CP= "♚";
         public List<Pozycja_Planszy> pozycje = new List<Pozycja_Planszy>();
         public int PktG = 0;
         public int PktK = 0;
+        public string wej_ostatniejpoz;
+        public string wej_przedostatniejpoz;
         public MainWindow()
         {
             InitializeComponent();
 
-
+            
             Startup();
             Reset_Border();
             
@@ -218,6 +220,8 @@ namespace Hexapawn
             {
                 if(poz.Wej == Get_Poz())
                 {
+                    wej_przedostatniejpoz = wej_ostatniejpoz;
+                    wej_ostatniejpoz = poz.Wej;
                     Set_Poz(poz.Wyj[0]);
                     await Task.Delay(500);
                     poz_found = true;
@@ -278,6 +282,8 @@ namespace Hexapawn
         public bool Check_EndAsync()
         {
             string poz = Get_Poz();
+            bool Czy_brak_bialych=true;
+            bool Czy_brak_czarnych=false;
             for(int i = 0; i < 3; i++)
             {
                 if(poz[i] == '1')
@@ -285,6 +291,7 @@ namespace Hexapawn
                     PktG += 1;
                     Pkt_restart();
                     PopUpAsync(1);
+                    Popraw();
                     Reset_Gry();
                     return true;
                 }
@@ -304,6 +311,7 @@ namespace Hexapawn
                 {
                     if(buttony[i,j].Content == BP)
                     {
+                        Czy_brak_bialych = false;
                         if (j > 0)
                         {
 
@@ -335,12 +343,33 @@ namespace Hexapawn
                             }
                         }
                     }
+                    if(buttony[i, j].Content == CP)
+                    {
+                        Czy_brak_czarnych = false;
+                    }
                 }
 
             }
             if (remis) {
                 Reset_Gry();
                 PopUpAsync(0);
+                return true;
+            }
+            else if (Czy_brak_czarnych)
+            {
+                PktG += 1;
+                Pkt_restart();
+                PopUpAsync(1);
+                Popraw();
+                Reset_Gry();
+                return true;
+            }
+            else if (Czy_brak_bialych)
+            {
+                PktK += 1;
+                Pkt_restart();
+                PopUpAsync(2);
+                Reset_Gry();
                 return true;
             }
             return false;
@@ -364,6 +393,31 @@ namespace Hexapawn
             else if (i == 2) { Komunikat.Content = "Wygrywają czarne"; }
             await Task.Delay(1000);
             Komunikat.Content = null;
+        }
+
+        public void Popraw()
+        {
+            foreach (Pozycja_Planszy poz in pozycje)
+            {
+                if (poz.Wej == wej_ostatniejpoz)
+                {
+                    Console.WriteLine("Usunieto "+ poz.Wyj[0]);
+                    poz.Wyj.RemoveAt(0);
+                    if(poz.Wyj.Count==0)
+                    {
+                        foreach (Pozycja_Planszy poz2 in pozycje)
+                        {
+                            if (poz2.Wej == wej_przedostatniejpoz)
+                            {
+                                Console.WriteLine("Usunieto " + poz2.Wyj[0]);
+                                poz2.Wyj.RemoveAt(0);
+                            }
+
+                        }
+                    }
+                }
+
+            }
         }
     }
 }
