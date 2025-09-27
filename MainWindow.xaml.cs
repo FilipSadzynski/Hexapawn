@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.IO;
+using System.Threading;
 
 namespace Hexapawn
 {
@@ -26,13 +27,15 @@ namespace Hexapawn
         public Button ostatni_klikniety;
         public string BP="BP", CP="CP";
         public List<Pozycja_Planszy> pozycje = new List<Pozycja_Planszy>();
+        public int PktG = 0;
+        public int PktK = 0;
         public MainWindow()
         {
             InitializeComponent();
 
 
             Startup();
-            Reset();
+            Reset_Border();
             
             
             
@@ -46,8 +49,8 @@ namespace Hexapawn
             //gdy biały pionek naciśnięty
             if((bool)(klikniety.Content == BP))
             {
-                //reset stanu wyboru
-                if(state == 1) { state = 0;Reset(); }
+                //Reset stanu wyboru
+                if(state == 1) { state = 0;Reset_Border(); }
 
                 //pozycja klikniętego przycisku w tablicy buttony
                 int[] poz = Findpoz(klikniety);
@@ -99,13 +102,15 @@ namespace Hexapawn
                     state = 0;
                     klikniety.Content = BP;
                     ostatni_klikniety.Content = null;
-                    Reset();
-                    Ruch_Czarnych();
+                    Reset_Border();
+                    if (!Check_EndAsync()) { Ruch_Czarnych(); }
+                    
+                    
                 }
                 else if (state == 1)
                 {
                     state = 0;
-                    Reset();
+                    Reset_Border();
                 }
             }
             
@@ -123,7 +128,7 @@ namespace Hexapawn
             buttony[0,2] = Button7;
             buttony[1,2] = Button8;
             buttony[2,2] = Button9;
-
+            Pkt_restart();
             string plik = "pozycje.txt";
 
             string[] lines = File.ReadAllLines(plik);
@@ -143,22 +148,23 @@ namespace Hexapawn
                 
             }
 
-            foreach (Pozycja_Planszy poz in pozycje)
-            {
-                Console.WriteLine("");
-                Console.Write(poz.Wej + " ");
-                foreach (string w in poz.Wyj)
-                {
-                    Console.Write(w+ " ");
-                }
+            // Wypisanie pozycji i odpowiedzi na te pozycje
+            //foreach (Pozycja_Planszy poz in pozycje)
+            //{
+            //    Console.WriteLine("");
+            //    Console.Write(poz.Wej + " ");
+            //    foreach (string w in poz.Wyj)
+            //    {
+            //        Console.Write(w+ " ");
+            //    }
               
-            }
+            //}
 
 
         }
 
-        //reset wyboru 
-        public void Reset()
+        //Reset wyboru 
+        public void Reset_Border()
         {
             for(int i=0; i<3; i++)
             {
@@ -200,21 +206,34 @@ namespace Hexapawn
                 buttony[i,0].Content = CP;
                 buttony[i, 2].Content = BP;
             }
-            Console.WriteLine(Get_Poz());
+            
         }
 
-        private void Ruch_Czarnych()
+        private async void Ruch_Czarnych()
         {
+            
+            bool poz_found = false;
             //Szukanie pozycji i odpowiadanie na nią
             foreach (Pozycja_Planszy poz in pozycje)
             {
                 if(poz.Wej == Get_Poz())
                 {
-                    Console.WriteLine(poz.Wyj[0]);
                     Set_Poz(poz.Wyj[0]);
+                    await Task.Delay(500);
+                    poz_found = true;
                 }
 
             }
+            if (!poz_found)
+            {
+                string plik = "pozycje.txt";
+                File.AppendAllText(plik, Environment.NewLine + Get_Poz());
+                Console.WriteLine("Pozycja do dodania");
+            }
+            
+            Check_EndAsync();
+
+
         }
 
         //Pozycja jako ciąg 9 cyfr
@@ -248,6 +267,103 @@ namespace Hexapawn
                 }
 
             }
+        }
+
+        public void Pkt_restart()
+        {
+            Pkt_Gracza.Content = "Pkt Gracza: " + PktG;
+            Pkt_AI.Content = "Pkt Kompa: "+ PktK;
+        }
+
+        public bool Check_EndAsync()
+        {
+            string poz = Get_Poz();
+            for(int i = 0; i < 3; i++)
+            {
+                if(poz[i] == '1')
+                {
+                    PktG += 1;
+                    Pkt_restart();
+                    PopUpAsync(1);
+                    Reset_Gry();
+                    return true;
+                }
+                if (poz[i + 6] == '2')
+                {
+                    PktK += 1;
+                    Pkt_restart();
+                    PopUpAsync(2);
+                    Reset_Gry();
+                    return true;
+                }
+            }
+            bool remis = true;
+            for (int j = 0; j < 3; j++)
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    if(buttony[i,j].Content == BP)
+                    {
+                        if (j > 0)
+                        {
+
+                            if (buttony[i, j - 1].Content == null)
+                            {
+                                remis = false;
+                            }
+                        }
+
+                        //zbicia na skos
+                        if (j > 0)
+                        {
+                            //w prawo
+                            if (i > 0)
+                            {
+                                if (buttony[i - 1, j - 1].Content == CP)
+                                {
+                                    remis = false;
+                                }
+                            }
+
+                            //w lewo
+                            if (i < 2)
+                            {
+                                if (buttony[i + 1, j - 1].Content == CP)
+                                {
+                                    remis=false;
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
+            if (remis) {
+                Reset_Gry();
+                PopUpAsync(0);
+                return true;
+            }
+            return false;
+            
+        }
+
+        public void Reset_Gry()
+        {
+            for (int i = 0; i <= 2; i++)
+            {
+                buttony[i, 0].Content = CP;
+                buttony[i, 1].Content = null;
+                buttony[i, 2].Content = BP;
+            }
+        }
+
+        public async Task PopUpAsync(int i)
+        {
+            if (i == 0) { Komunikat.Content = "Remis"; }
+            else if (i == 1) { Komunikat.Content = "Wygrywają Białe"; }
+            else if (i == 2) { Komunikat.Content = "Wygrywają czarne"; }
+            await Task.Delay(1000);
+            Komunikat.Content = null;
         }
     }
 }

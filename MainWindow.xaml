@@ -5,14 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Hexapawn"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="600">
-    <Grid Grid.ColumnSpan="3" Grid.RowSpan="3">
+        Title="MainWindow" Height="800" Width="600">
+    <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*" />
-            <ColumnDefinition Width="1*" />
-            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="2*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
             <RowDefinition Height="1*"/>
             <RowDefinition Height="1*"/>
             <RowDefinition Height="1*"/>
@@ -27,5 +28,16 @@
         <Button Name="Button8" Click="Button_Click" Grid.Column="1" Grid.Row="2" Background="#FF1CE832" FontSize="100"></Button>
         <Button Name="Button9" Click="Button_Click" Grid.Column="2" Grid.Row="2" Background="#FF039813" FontSize="100"></Button>
         <Button Name="Start" Click="Start_Click" Grid.Column="1" Grid.Row="1" Background="#FF5F5F5F" FontSize="80">Start</Button>
+        <Grid Grid.Column="0" Grid.Row="3">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Label Name="Pkt_Gracza" Grid.Row="0" FontSize="32">Pkt Gracz: 0</Label>
+            <Label Name="Pkt_AI" Grid.Row="1" FontSize="32">Pkt Komp: 0</Label>
+
+        </Grid>
+        <Label Name="Komunikat" Grid.Row="3" Grid.RowSpan="2" Grid.Column="1" FontSize="18"/>
+
     </Grid>
 </Window>
