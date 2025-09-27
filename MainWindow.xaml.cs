@@ -25,6 +25,7 @@ namespace Hexapawn
         public int state = 0;
         public Button ostatni_klikniety;
         public string BP="BP", CP="CP";
+        public List<Pozycja_Planszy> pozycje = new List<Pozycja_Planszy>();
         public MainWindow()
         {
             InitializeComponent();
@@ -32,8 +33,8 @@ namespace Hexapawn
 
             Startup();
             Reset();
-            //otwarcie pliku
-            FileStream plik = new FileStream("pozycje.txt", FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            
+            
             
         }
         
@@ -122,7 +123,38 @@ namespace Hexapawn
             buttony[0,2] = Button7;
             buttony[1,2] = Button8;
             buttony[2,2] = Button9;
-            
+
+            string plik = "pozycje.txt";
+
+            string[] lines = File.ReadAllLines(plik);
+            foreach (string line in lines)
+            {
+                if (string.IsNullOrWhiteSpace(line))
+                    continue;
+
+                string[] parts = line.Split('/');
+
+                string wej = parts[0].Trim();
+
+                string[] wyj = parts[1].Split(',');
+
+                Pozycja_Planszy poz = new Pozycja_Planszy(wej, wyj);
+                pozycje.Add(poz);
+                
+            }
+
+            foreach (Pozycja_Planszy poz in pozycje)
+            {
+                Console.WriteLine("");
+                Console.Write(poz.Wej + " ");
+                foreach (string w in poz.Wyj)
+                {
+                    Console.Write(w+ " ");
+                }
+              
+            }
+
+
         }
 
         //reset wyboru 
@@ -137,7 +169,7 @@ namespace Hexapawn
                 
             }
         }
-
+        //szukanie pozycji kliknietego przycisku
         public int[] Findpoz(Button b)
         {
             int[] result = new int[2];
@@ -168,11 +200,54 @@ namespace Hexapawn
                 buttony[i,0].Content = CP;
                 buttony[i, 2].Content = BP;
             }
+            Console.WriteLine(Get_Poz());
         }
 
         private void Ruch_Czarnych()
         {
+            //Szukanie pozycji i odpowiadanie na nią
+            foreach (Pozycja_Planszy poz in pozycje)
+            {
+                if(poz.Wej == Get_Poz())
+                {
+                    Console.WriteLine(poz.Wyj[0]);
+                    Set_Poz(poz.Wyj[0]);
+                }
 
+            }
+        }
+
+        //Pozycja jako ciąg 9 cyfr
+        private string Get_Poz()
+        {
+            string wyn = "";
+            for (int j = 0; j < 3; j++)
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    if (buttony[i,j].Content == null) { wyn += "0"; }
+                    else if(buttony[i, j].Content == BP) { wyn += "1"; }
+                    else if(buttony[i, j].Content == CP) { wyn += "2"; }
+                }
+
+            }
+            return wyn;
+        }
+        //ustawianie planszy z 9 cyfr
+        private void Set_Poz(string s)
+        {
+            int inc = 0;
+            for (int j = 0; j < 3; j++)
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    if (s[inc]=='0') { buttony[i, j].Content = null; }
+                    else if (s[inc] == '1') { buttony[i, j].Content = BP; }
+                    else if (s[inc] == '2') { buttony[i, j].Content = CP; }
+                    inc++; 
+                }
+
+            }
         }
     }
 }
