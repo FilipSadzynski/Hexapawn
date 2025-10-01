@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.IO;
 using System.Threading;
+using System.Timers;
 
 namespace Hexapawn
 {
@@ -22,6 +23,7 @@ namespace Hexapawn
     /// </summary>
     public partial class MainWindow : Window
     {
+        private Random rnd = new Random();
         public Button[,] buttony = new Button[3,3];
         public int state = 0;
         public Button ostatni_klikniety;
@@ -29,6 +31,8 @@ namespace Hexapawn
         public List<Pozycja_Planszy> pozycje = new List<Pozycja_Planszy>();
         public int PktG = 0;
         public int PktK = 0;
+        private int los;
+        private int pralos;
         public string wej_ostatniejpoz;
         public string wej_przedostatniejpoz;
         public MainWindow()
@@ -221,8 +225,10 @@ namespace Hexapawn
                 if(poz.Wej == Get_Poz())
                 {
                     wej_przedostatniejpoz = wej_ostatniejpoz;
+                    pralos = los;
                     wej_ostatniejpoz = poz.Wej;
-                    Set_Poz(poz.Wyj[0]);
+                    los = rnd.Next(poz.Wyj.Count);
+                    Set_Poz(poz.Wyj[los]);
                     await Task.Delay(500);
                     poz_found = true;
                 }
@@ -299,6 +305,7 @@ namespace Hexapawn
                 {
                     PktK += 1;
                     Pkt_restart();
+                    Nagroda();
                     PopUpAsync(2);
                     Reset_Gry();
                     return true;
@@ -367,6 +374,7 @@ namespace Hexapawn
             else if (Czy_brak_bialych)
             {
                 PktK += 1;
+                Nagroda();
                 Pkt_restart();
                 PopUpAsync(2);
                 Reset_Gry();
@@ -401,20 +409,36 @@ namespace Hexapawn
             {
                 if (poz.Wej == wej_ostatniejpoz)
                 {
-                    Console.WriteLine("Usunieto "+ poz.Wyj[0]);
-                    poz.Wyj.RemoveAt(0);
+                    Console.WriteLine("Usunieto "+ poz.Wyj[los]);
+                    poz.Wyj.RemoveAt(los);
                     if(poz.Wyj.Count==0)
                     {
                         foreach (Pozycja_Planszy poz2 in pozycje)
                         {
                             if (poz2.Wej == wej_przedostatniejpoz)
                             {
-                                Console.WriteLine("Usunieto " + poz2.Wyj[0]);
-                                poz2.Wyj.RemoveAt(0);
+                                Console.WriteLine("Usunieto " + poz2.Wyj[pralos]);
+                                poz2.Wyj.RemoveAt(pralos);
                             }
 
                         }
                     }
+                }
+
+            }
+        }
+
+        public void Nagroda()
+        {
+            foreach (Pozycja_Planszy poz in pozycje)
+            {
+                if (poz.Wej == wej_ostatniejpoz)
+                {
+                    Console.WriteLine("Zostawiono jedynie " + poz.Wyj[los]);
+                    string temp = poz.Wyj[los];
+                    poz.Wyj.Clear();
+                    poz.Wyj.Add(temp);
+                    
                 }
 
             }
