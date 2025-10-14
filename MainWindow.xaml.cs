@@ -397,8 +397,8 @@ namespace Hexapawn
         public async Task PopUpAsync(int i)
         {
             if (i == 0) { Komunikat.Content = "Remis"; }
-            else if (i == 1) { Komunikat.Content = "Wygrywają Białe"; }
-            else if (i == 2) { Komunikat.Content = "Wygrywają czarne"; }
+            else if (i == 1) { Komunikat.Content = "Wygrywają \n Białe"; }
+            else if (i == 2) { Komunikat.Content = "Wygrywają \n czarne"; }
             await Task.Delay(1000);
             Komunikat.Content = null;
         }
@@ -442,6 +442,11 @@ namespace Hexapawn
                 }
 
             }
+        }
+
+        private void Zapisz_OnClick(object sender, RoutedEventArgs e)
+        {
+            
         }
     }
 }

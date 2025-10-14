@@ -38,6 +38,7 @@
 
         </Grid>
         <Label Name="Komunikat" Grid.Row="3" Grid.RowSpan="2" Grid.Column="1" FontSize="18"/>
+        <Button Name="Zapisz" Click="Zapisz_OnClick" Grid.Column="2" Grid.Row="3" Background="#DDDDDD" FontSize="80">Save</Button>
 
     </Grid>
 </Window>

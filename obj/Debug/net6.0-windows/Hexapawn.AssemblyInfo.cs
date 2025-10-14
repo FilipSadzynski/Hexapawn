@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Hexapawn")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ab53cbd04d3157fb48162e21a38da59d1c6182bc")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3e8ace2be1e30d9978e4c331a98538d4ec1473d4")]
 [assembly: System.Reflection.AssemblyProductAttribute("Hexapawn")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Hexapawn")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
